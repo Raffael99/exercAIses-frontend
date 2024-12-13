@@ -25,6 +25,7 @@ import { CompactLayoutComponent } from './layouts/vertical/compact/compact.compo
 import { DenseLayoutComponent } from './layouts/vertical/dense/dense.component';
 import { FuturisticLayoutComponent } from './layouts/vertical/futuristic/futuristic.component';
 import { ThinLayoutComponent } from './layouts/vertical/thin/thin.component';
+import { CustomLayoutComponent } from './layouts/custom/classic/custom.component';
 
 @Component({
     selector: 'layout',
@@ -33,6 +34,7 @@ import { ThinLayoutComponent } from './layouts/vertical/thin/thin.component';
     encapsulation: ViewEncapsulation.None,
     standalone: true,
     imports: [
+        CustomLayoutComponent,
         EmptyLayoutComponent,
         CenteredLayoutComponent,
         EnterpriseLayoutComponent,

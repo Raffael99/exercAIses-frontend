@@ -1,12 +1,12 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 
 @Component({
-    selector     : 'example',
+    selector     : 'exercise-generator',
     standalone   : true,
-    templateUrl  : './example.component.html',
+    templateUrl  : './exercise-generator.component.html',
     encapsulation: ViewEncapsulation.None,
 })
-export class ExampleComponent
+export class ExerciseGeneratorComponent
 {
     /**
      * Constructor
