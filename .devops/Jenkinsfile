@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+
+    environment {
+        // Modify these variables according to your needs
+        DOCKER_COMPOSE_FILE = 'docker-compose.yml'
+        // If you need to push to a registry, uncomment and modify these
+        // DOCKER_REGISTRY = 'your-registry-url'
+        // DOCKER_CREDENTIALS = credentials('docker-credentials-id')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from GitHub repository
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    // Ensure we're using the correct Docker environment
+                    sh 'docker info'
+
+                    // Build the services defined in docker-compose.yml
+                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} build'
+                }
+            }
+        }
+
+        stage('Start Services') {
+            steps {
+                script {
+                    // Bring up the services in detached mode
+                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} up -d'
+
+                    // Optional: Wait for services to be healthy
+                    sh 'sleep 10'
+                }
+            }
+        }
+
+        stage('Verify') {
+            steps {
+                script {
+                    // Check if services are running
+                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} ps'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                // Clean up: Stop and remove containers, networks, and volumes
+                sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} down -v'
+
+                // Clean up unused docker resources
+                sh 'docker system prune -f'
+            }
+        }
+
+        success {
+            echo 'Build and deployment successful!'
+        }
+
+        failure {
+            echo 'Build or deployment failed!'
+        }
+    }
+}

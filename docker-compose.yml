@@ -1,0 +1,6 @@
+version: '3.8'
+services:
+    exercaises-frontend:
+        build: ./
+        ports:
+            - "3100:80"  # Maps host port 3100 to container port 80
