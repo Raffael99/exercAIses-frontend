@@ -10,6 +10,18 @@ pipeline {
     }
 
     stages {
+        stage('Clean Old Services') {
+            steps {
+                script {
+                    // Stop and remove any existing containers from a previous run
+                    sh 'docker compose -f ${DOCKER_COMPOSE_FILE} down -v || true'
+
+                    // Optional: Remove any dangling or unused images, networks, or volumes
+                    sh 'docker system prune -f'
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 // Checkout code from GitHub repository
@@ -52,16 +64,6 @@ pipeline {
     }
 
     post {
-        always {
-            script {
-                // Clean up: Stop and remove containers, networks, and volumes
-                sh 'docker compose -f ${DOCKER_COMPOSE_FILE} down -v'
-
-                // Clean up unused docker resources
-                sh 'docker system prune -f'
-            }
-        }
-
         success {
             echo 'Build and deployment successful!'
         }
