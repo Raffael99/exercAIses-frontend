@@ -10,7 +10,7 @@ COPY ./ /usr/local/app/
 RUN npm install
 
 # Generate the build of the application
-RUN npm run build
+RUN npm run build --output-hashing=all
 
 # Serve Application using Nginx Server
 
