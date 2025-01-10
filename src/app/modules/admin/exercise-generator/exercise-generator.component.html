@@ -39,7 +39,7 @@
                                 class="h-15"
                                 mat-fab
                                 color="primary"
-                                (click)="this.generateForm.controls['numExercises'].setValue(this.generateForm.controls['numExercises'].value - 1)"
+                                (click)="this.decreaseNumExercises()"
                                 >
                                 <mat-icon [svgIcon]="'heroicons_solid:minus'"></mat-icon>
                             </button>
@@ -56,7 +56,7 @@
                                 class="h-15"
                                 mat-fab
                                 color="primary"
-                                (click)="this.generateForm.controls['numExercises'].setValue(this.generateForm.controls['numExercises'].value + 1)"
+                                (click)="this.increaseNumExercises()"
                             >
                                 <mat-icon [svgIcon]="'heroicons_solid:plus'"></mat-icon>
                             </button>

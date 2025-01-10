@@ -39,9 +39,16 @@ export class ExerciseGeneratorComponent {
         // Create the exercise form
         this.generateForm = this._formBuilder.group({
             name: ['', Validators.required],
-            numExercises: ['5', [Validators.required, Validators.email]],
+            numExercises: [5, [Validators.required, Validators.email]],
             subject: ['', Validators.required],
             message: ['', Validators.required],
         });
+    }
+
+    increaseNumExercises(): void {
+        this.generateForm.value.numExercises++;
+    }
+    decreaseNumExercises(): void {
+        this.generateForm.value.numExercises--;
     }
 }
