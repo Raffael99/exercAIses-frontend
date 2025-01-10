@@ -39,16 +39,19 @@ export class ExerciseGeneratorComponent {
         // Create the exercise form
         this.generateForm = this._formBuilder.group({
             name: ['', Validators.required],
-            numExercises: [5, [Validators.required, Validators.email]],
+            numExercises: [5, [Validators.required]],
             subject: ['', Validators.required],
             message: ['', Validators.required],
         });
     }
 
     increaseNumExercises(): void {
-        this.generateForm.value.numExercises++;
+        const currentValue: number = this.generateForm.get('numExercises')?.value || 0;
+        this.generateForm.get('numExercises')?.setValue(currentValue + 1);
     }
+
     decreaseNumExercises(): void {
-        this.generateForm.value.numExercises--;
+        const currentValue: number = this.generateForm.get('numExercises')?.value || 0;
+        this.generateForm.get('numExercises')?.setValue(currentValue - 1);
     }
 }
