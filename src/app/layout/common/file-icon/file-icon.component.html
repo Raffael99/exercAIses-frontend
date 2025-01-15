@@ -1,6 +1,19 @@
 <div class="flex flex-col items-center flex-shrink mx-2">
-    <mat-icon class="aspect-square h-10 w-10" [svgIcon]="'heroicons_outline:document'">
-    </mat-icon>
-    <p *ngIf="file.name.length <= 15" class="flex-wrap text-xs text-center max-w-20">{{file.name}}</p>
-    <p *ngIf="file.name.length > 15" class="flex-wrap text-xs text-center max-w-20">{{file.name.slice(0,13)}}...</p>
+
+    <div class="relative">
+        <button
+            (click)="removeFile(file)"
+            class="absolute -top-3 -right-3 rounded-full"
+            aria-label="Remove File">
+            <mat-icon
+                class="h-[1px] w-[1px] rounded-full bg-gray-300 hover:bg-red-100 focus:outline-none"
+                [svgIcon]="'heroicons_outline:x-mark'"
+            ></mat-icon>
+        </button>
+        <mat-icon class="aspect-square h-10 w-10" [svgIcon]="'heroicons_outline:document'">
+        </mat-icon>
+    </div>
+
+    <p *ngIf="file.name.length <= 15" class="text-xs text-center max-w-20">{{file.name}}</p>
+    <p *ngIf="file.name.length > 15" class="text-xs text-center max-w-20">{{file.name.slice(0,7)}}...{{file.name.slice(-6,file.name.length)}}</p>
 </div>

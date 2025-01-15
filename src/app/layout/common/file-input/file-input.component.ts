@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
@@ -12,6 +12,8 @@ import { FileIconComponent } from '../file-icon/file-icon.component';
     templateUrl: './file-input.component.html',
 })
 export class FileInputComponent implements OnInit {
+    @Input() limit: number = 1;
+
     error: string;
     dragAreaClass: string = 'dragarea';
     draggedFiles: File[] = [];
@@ -50,11 +52,14 @@ export class FileInputComponent implements OnInit {
     }
 
     saveFiles(files: FileList) {
-        this.error = '';
-        console.log(files[0].size, files[0].name, files[0].type);
-        for (let i = 0; i < files.length; i++) {
-            this.draggedFiles.push(files[i]);
+        if (files.length + this.draggedFiles.length > this.limit) {
+            this.error = 'Only ' + this.limit+ ' file' + (this.limit == 1 ? ' is' : 's are') + ' allowed.';
+            return;
+        } else {
+            this.error = '';
+            for (let i = 0; i < files.length; i++) {
+                this.draggedFiles.push(files[i]);
+            }
         }
-
     }
 }
