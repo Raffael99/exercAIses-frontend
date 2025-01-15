@@ -1,0 +1,17 @@
+<div class="w-full h-20 border-dashed cursor-pointer border-black border-2" draggable="true" ngClass="{{dragAreaClass}}" (click)="file.click()">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            Drag files here or click to open
+            <input type="file"
+                   #file
+                   [multiple]="true"
+                   (change)="onFileChange($event)"
+                   style="display:none" />
+        </div>
+    </div>
+</div>
+<div class="flex flex-row flex-wrap justify-start items-start my-4" *ngIf="draggedFiles">
+    <div *ngFor="let file of draggedFiles">
+        <file-icon [file]="file"></file-icon>
+    </div>
+</div>

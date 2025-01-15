@@ -28,7 +28,7 @@
                                 [required]="true"
                                 [placeholder]="'Example Exercise'"
                             />
-                            <mat-label>Name</mat-label>
+                            <mat-label>Exercise name</mat-label>
                             @if (generateForm.get('name').hasError('required')) {
                                 <mat-error> Required </mat-error>
                             }
@@ -60,6 +60,10 @@
                             >
                                 <mat-icon [svgIcon]="'heroicons_solid:plus'"></mat-icon>
                             </button>
+                        </div>
+                        <!-- Upload lecture files -->
+                        <div class="w-full h-full">
+                            <file-input></file-input>
                         </div>
                     </div>
 
