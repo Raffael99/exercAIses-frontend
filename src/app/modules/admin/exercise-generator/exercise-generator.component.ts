@@ -7,6 +7,7 @@ import { MatIcon } from '@angular/material/icon';
 import { FileInputComponent } from '../../../layout/common/file-input/file-input.component';
 import { FileService } from '../../../core/file/file.service';
 import { Subject, takeUntil } from 'rxjs';
+import { NgForOf, NgIf } from '@angular/common';
 
 @Component({
     selector: 'exercise-generator',
@@ -41,6 +42,8 @@ import { Subject, takeUntil } from 'rxjs';
         MatFabButton,
         FileInputComponent,
         MatButton,
+        NgIf,
+        NgForOf,
     ],
 })
 export class ExerciseGeneratorComponent implements OnInit, OnDestroy {
@@ -48,15 +51,19 @@ export class ExerciseGeneratorComponent implements OnInit, OnDestroy {
     generateForm: FormGroup;
 
     files: File[] = [];
+    results: string[] = [];
+    answerAvailable: boolean = false;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
      */
-    constructor(private _formBuilder: FormBuilder,
-                private _fileService: FileService,
-                private _changeDetectorRef: ChangeDetectorRef) {}
+    constructor(
+        private _formBuilder: FormBuilder,
+        private _fileService: FileService,
+        private _changeDetectorRef: ChangeDetectorRef
+    ) {}
 
     // -----------------------------------------------------------------------------------------------------
     // @ Lifecycle hooks
@@ -69,10 +76,11 @@ export class ExerciseGeneratorComponent implements OnInit, OnDestroy {
         // Create the exercise form
         this.generateForm = this._formBuilder.group({
             name: ['', Validators.required],
-            numExercises: [5, [Validators.required]]
+            numExercises: [5, [Validators.required]],
         });
 
-        this._fileService.getFile$()
+        this._fileService
+            .getFile$()
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((files: File[]) => {
                 this.files = files;
@@ -81,10 +89,14 @@ export class ExerciseGeneratorComponent implements OnInit, OnDestroy {
                 this._changeDetectorRef.markForCheck();
             });
 
-        this._fileService.getResults$()
+        this._fileService
+            .getResults$()
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((results: string) => {
-                console.log(results);
+                results.split('\n').forEach((result) => {
+                    this.results.push(result);
+                })
+                this.answerAvailable = results.length > 0;
             });
     }
 

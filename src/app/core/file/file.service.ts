@@ -48,7 +48,7 @@ export class FileService {
     sendFileContent(): void {
         const file = this.files[0];
 
-        const processingCommand = "please give 5 example questions to the topic of the following content";
+        const processingCommand = "please give 5 example questions to the topic of the following pdf: ";
 
         // Create FormData object for multipart/form-data
         const formData = new FormData();
@@ -56,9 +56,10 @@ export class FileService {
 
         // Send the POST request
         this.http.post(`${this.BACKEND_URL}/evaluator?aspects=${processingCommand}`, formData).subscribe({
-            next: (response) => {
+            next: (response: Answer) => {
+                response.anwser
                 console.log('Response:', response);
-                this._results.next(response.toString());
+                this._results.next(response.anwser);
             },
             error: (err) => {
                 console.error('Error sending file content', err);
@@ -66,4 +67,8 @@ export class FileService {
             },
         });
     }
+}
+
+interface Answer {
+    anwser: string;
 }
