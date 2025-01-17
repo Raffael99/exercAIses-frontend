@@ -1,9 +1,11 @@
-import { Component, HostListener, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { NgClass, NgForOf, NgIf } from '@angular/common';
 import { FileIconComponent } from '../file-icon/file-icon.component';
+import { FileService } from '../../../core/file/file.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'file-input',
@@ -11,19 +13,41 @@ import { FileIconComponent } from '../file-icon/file-icon.component';
     imports: [NgClass, NgIf, NgForOf, FileIconComponent],
     templateUrl: './file-input.component.html',
 })
-export class FileInputComponent implements OnInit {
+export class FileInputComponent implements OnInit, OnDestroy {
+
+    constructor(private _fileService: FileService,
+                private _changeDetectorRef: ChangeDetectorRef) {}
+
     @Input() limit: number = 1;
 
     error: string;
     dragAreaClass: string = 'dragarea';
     draggedFiles: File[] = [];
 
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
+
+    ngOnInit(): void {
+        this.dragAreaClass = 'dragarea';
+        // Subscribe to user changes
+        this._fileService.getFile$()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((files: File[]) => {
+                this.draggedFiles = files;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+    }
+
+    ngOnDestroy(): void {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next(null);
+        this._unsubscribeAll.complete();
+    }
+
     onFileChange(event: any) {
         let files: FileList = event.target.files;
         this.saveFiles(files);
-    }
-    ngOnInit() {
-        this.dragAreaClass = 'dragarea';
     }
     @HostListener('dragover', ['$event']) onDragOver(event: any) {
         this.dragAreaClass = 'droparea';
@@ -57,9 +81,7 @@ export class FileInputComponent implements OnInit {
             return;
         } else {
             this.error = '';
-            for (let i = 0; i < files.length; i++) {
-                this.draggedFiles.push(files[i]);
-            }
+            this._fileService.addFiles(files);
         }
     }
 }

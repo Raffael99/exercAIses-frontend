@@ -1,61 +1,69 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-
 @Injectable({
     providedIn: 'root',
 })
 export class FileService {
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) {
+        this._files.next(this.files);
+    }
 
-    private BACKEND_URL = 'https://exercaise-minimal-instance.agreeablehill-460d04f2.westeurope.azurecontainerapps.io/generator';
+    private BACKEND_URL = 'https://exercaise-minimal-instance.agreeablehill-460d04f2.westeurope.azurecontainerapps.io';
 
-    private files: File[] = [];
+    private _files: ReplaySubject<File[]> = new ReplaySubject<File[]>(1);
+    private files: File[] = []; // Internal state for file list
 
+    private _results: ReplaySubject<string> = new ReplaySubject<string>(1);
+
+    // Observable for the list of files
+    getFile$() {
+        return this._files.asObservable();
+    }
+
+    getResults$(): Observable<string> {
+        return this._results.asObservable();
+    }
+
+    // Add a single file
     addFile(file: File): void {
         this.files.push(file);
+        this._files.next([...this.files]); // Emit updated list
     }
 
+    // Add multiple files
+    addFiles(files: FileList): void {
+        for (let i = 0; i < files.length; i++) {
+            this.files.push(files[i]);
+        }
+        this._files.next([...this.files]); // Emit updated list
+    }
+
+    // Remove a specific file
     removeFile(file: File): void {
         this.files = this.files.filter((f) => f !== file);
+        this._files.next([...this.files]); // Emit updated list
     }
 
-    getFiles(): File[] {
-        return this.files;
-    }
-
-    // Send files to the backend
-    uploadFiles(): Observable<any> {
+    sendFileContent(): void {
         const file = this.files[0];
-        if (file) {
-            return new Observable(observer => {
-                const reader = new FileReader();
 
-                // Read file as text
-                reader.onload = () => {
-                    const fileContent = reader.result as string;
-                    this.sendFileContent(fileContent).subscribe({
-                        next: response => {
-                            observer.next(response);
-                            observer.complete();
-                        },
-                        error: err => observer.error(err),
-                    });
-                };
+        const processingCommand = "please give 5 example questions to the topic of the following content";
 
-                reader.onerror = () => {
-                    observer.error('Error reading file');
-                };
+        // Create FormData object for multipart/form-data
+        const formData = new FormData();
+        formData.append('file', file); // Attach the file
 
-                reader.readAsText(file);
-            });
-        } else {
-            throw new Error('No file to upload');
-        }
-    }
-
-    sendFileContent(fileContent: string): Observable<any> {
-        const processingCommand = "please give 5 example quesions to the topic of the following content:\n"
-        return this.http.post(`${this.BACKEND_URL}?text=${processingCommand}${fileContent}`, {});
+        // Send the POST request
+        this.http.post(`${this.BACKEND_URL}/evaluator?aspects=${processingCommand}`, formData).subscribe({
+            next: (response) => {
+                console.log('Response:', response);
+                this._results.next(response.toString());
+            },
+            error: (err) => {
+                console.error('Error sending file content', err);
+                this._results.error(err);
+            },
+        });
     }
 }

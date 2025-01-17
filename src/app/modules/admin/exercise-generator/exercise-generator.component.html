@@ -63,7 +63,17 @@
                         </div>
                         <!-- Upload lecture files -->
                         <div class="w-full h-full">
-                            <file-input limit=2></file-input>
+                            <file-input limit=1></file-input>
+                        </div>
+                        <div>
+                            <button
+                                mat-raised-button
+                                color="primary"
+                                [disabled]="!generateForm.valid || this.files.length === 0"
+                                (click)="generateExercise()"
+                            >
+                                Generate Exercise
+                            </button>
                         </div>
                     </div>
                 </form>
